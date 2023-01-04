@@ -49,13 +49,15 @@ const Grid = () => {
           break;
         }
       }
-        setSquares([...squares,{value, color, indexValue}]);
+        setSquares([...squares,{value, color, indexValue, preIndex:'-1'}]);
     }
   }, []); 
 
 
   const generateRandomSquare = (squares)=>{
 
+    if(squares.length>15) return;
+    
       const rand = Math.pow(2, Math.floor(Math.random() * 2));
       if(rand==0) var value = 4;
       else var value = 2;
@@ -66,7 +68,6 @@ const Grid = () => {
 
       const index = [];
       squares.forEach(sqr => index.push(sqr.indexValue));
-      if(index.length > 16) return {};
       while(true){
         indexValue = Math.floor(Math.random() * 16);
         if(!index.includes(indexValue)){
@@ -74,7 +75,7 @@ const Grid = () => {
         }
       }
 
-      return {value, color, indexValue};
+      return {value, color, indexValue, preIndex:'-1'};
 
   }
 
@@ -83,13 +84,122 @@ const dummy = [{value:2, color:getColorForValue(2), indexValue: 12}, {value:2, c
 //setSquares(dummy);
 
 
-const handleKeyDown = (event)=>{
+const handleKeyDown = (event) =>{
+  console.log(event.key);
+if(event.key !== 'ArrowUp' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'ArrowDown'){
+  return;
+}
 
-  console.log(event.keyCode);
+
 
   var updated_squares=[];
+  var changed=false;
 
-  if(squares.length === 16) return;
+  for(let i=0; i<4; i++){
+    const slice = [];
+    const sqrs = JSON.parse(JSON.stringify(squares));
+
+    sqrs.forEach(sqr=>{
+      if(event.key === 'ArrowLeft' || event.key === 'ArrowRight'){
+        if(Math.floor(sqr.indexValue/4)===i) 
+          slice.push(sqr);
+      }
+      else if(Math.floor(sqr.indexValue%4)===i){
+        slice.push(sqr);
+      }
+    });
+
+    if(event.key === 'ArrowLeft' || event.key === 'ArrowUp'){
+      slice.sort((a,b)=> a.indexValue-b.indexValue);
+    }
+    else{
+      slice.sort((a,b)=>b.indexValue-a.indexValue);
+    }
+
+    var size= slice.length;
+    var filled = 0;
+
+    while(filled<size){
+      var skip = false;
+
+      if(filled+1<size && slice[filled+1].value === slice[filled].value){
+        //merge slice[filled+1] and slice[filled]
+
+        const value = slice[filled].value*2;
+        const color = getColorForValue(value);
+        const preIndex = slice[filled+1].indexValue;
+
+        var indexValue;
+        if(event.key==='ArrowLeft') indexValue=(i*4)+filled;
+        else if(event.key === 'ArrowRight') indexValue=(i*4)+3-filled;
+        else if(event.key === 'ArrowUp') indexValue=i+filled*4;
+        else indexValue=i+(3-filled)*4;
+
+        // push the merged tile in updated squares
+        updated_squares.push({value, color, indexValue, preIndex});
+
+        //removed the one the merged tiles either filled or filled+1 from slice array
+        slice.splice(filled+1,1);
+
+        //updated size
+        size--;
+        skip = true;
+      }
+
+      if(!skip){
+        const value = slice[filled].value;
+        const color = getColorForValue(value);
+        const preIndex = slice[filled].indexValue;
+        var indexValue;
+
+        if(event.key==='ArrowLeft') indexValue=(i*4)+filled;
+        else if(event.key === 'ArrowRight') indexValue=(i*4)+3-filled;
+        else if(event.key === 'ArrowUp') indexValue=i+filled*4;
+        else indexValue=i+(3-filled)*4;
+
+        let goAhead = true;
+        updated_squares.forEach(sqr =>{ 
+        if(sqr.indexValue === indexValue) 
+            goAhead = false;
+        });
+
+        if(goAhead)
+          updated_squares.push({value,color,indexValue, preIndex});
+      }
+
+      filled++;
+    }
+  }
+
+
+  if(squares.length === updated_squares.length ){
+    squares.sort((a,b)=>a.indexValue-b.indexValue);
+    updated_squares.sort((a,b)=>a.indexValue-b.indexValue);
+
+    for(let i=0; i<squares.length; i++){
+      if(squares[i].indexValue !== updated_squares[i].indexValue || squares[i].value !== updated_squares[i].value){
+        changed=true;
+      }
+    }
+  }
+  else changed=true;
+
+  
+
+  if((event.key === 'ArrowUp' || event.key === 'ArrowDown' || event.key === 'ArrowLeft' || event.key === 'ArrowRight') && changed ){
+    updated_squares = [...updated_squares, generateRandomSquare(updated_squares)]
+    console.log([...updated_squares]);
+    setSquares(updated_squares);
+  }
+
+}
+
+
+const handleKeyDown_copy = (event)=>{
+  console.log(event.keyCode);
+  var updated_squares=[];
+  var changed = false;
+  
 
   if(event.key == 'ArrowLeft'){
 
@@ -117,8 +227,9 @@ const handleKeyDown = (event)=>{
             updated_squares.push({value,color,indexValue});
 
             row.splice(filled+1,1);
-            filled--;
+      //      filled--;
             size--;
+            changed=true;
           }
 
         else{
@@ -129,8 +240,10 @@ const handleKeyDown = (event)=>{
 
             let goAhead = true;
             updated_squares.forEach(sqr => { if(sqr.indexValue === indexValue) goAhead = false;} )
-            if(goAhead)
-            updated_squares.push({value,color,indexValue});
+            if(goAhead){
+              updated_squares.push({value,color,indexValue});
+              changed=true;
+             }
         }
       }
 
@@ -142,8 +255,10 @@ const handleKeyDown = (event)=>{
 
           let goAhead = true;
           updated_squares.forEach(sqr => { if(sqr.indexValue === indexValue) goAhead = false;} )
-          if(goAhead)
-          updated_squares.push({value,color,indexValue});
+          if(goAhead){
+            updated_squares.push({value,color,indexValue});
+            changed=true;
+           }
       }
 
         filled++;
@@ -178,8 +293,9 @@ const handleKeyDown = (event)=>{
             updated_squares.push({value,color,indexValue});
 
             row.splice(filled+1,1);
-            filled--;
+         //    filled--;
             size--;
+            changed=true;
           }
 
         else{
@@ -190,8 +306,10 @@ const handleKeyDown = (event)=>{
 
             let goAhead = true;
             updated_squares.forEach(sqr => { if(sqr.indexValue === indexValue) goAhead = false;} )
-            if(goAhead)
-            updated_squares.push({value,color,indexValue});
+            if(goAhead){
+              updated_squares.push({value,color,indexValue});
+              changed=true;
+             }
         }
       }
 
@@ -203,8 +321,10 @@ const handleKeyDown = (event)=>{
 
           let goAhead = true;
           updated_squares.forEach(sqr => { if(sqr.indexValue === indexValue) goAhead = false;} )
-          if(goAhead)
-          updated_squares.push({value,color,indexValue});
+          if(goAhead){
+            updated_squares.push({value,color,indexValue});
+            changed=true;
+           }
       }
 
         filled++;
@@ -236,7 +356,8 @@ if(event.key=='ArrowUp'){
           updated_squares.push({value, color, indexValue});
           col.splice(filled+1, 1);
           size--;
-          filled--;
+       //   filled--;
+       changed=true;
         }
 
         else{
@@ -249,6 +370,7 @@ if(event.key=='ArrowUp'){
              updated_squares.forEach(sqr => { if(sqr.indexValue === indexValue) goAhead = false;} )
              if(goAhead)
              updated_squares.push({value,color,indexValue});
+             changed=true;
          }
        }
  
@@ -261,8 +383,11 @@ if(event.key=='ArrowUp'){
  
            let goAhead = true;
            updated_squares.forEach(sqr => { if(sqr.indexValue === indexValue) goAhead = false;} )
-           if(goAhead)
-           updated_squares.push({value,color,indexValue});
+           if(goAhead){
+            updated_squares.push({value,color,indexValue});
+            changed=true;
+           }
+           
        }
  
          filled++;
@@ -291,7 +416,8 @@ if(event.key=='ArrowUp'){
             updated_squares.push({value, color, indexValue});
             col.splice(filled+1, 1);
             size--;
-            filled--;
+          //  filled--;
+          changed=true;
           }
   
           else{
@@ -302,8 +428,10 @@ if(event.key=='ArrowUp'){
    
                let goAhead = true;
                updated_squares.forEach(sqr => { if(sqr.indexValue === indexValue) goAhead = false;} )
-               if(goAhead)
+               if(goAhead){
                updated_squares.push({value,color,indexValue});
+               changed=true;
+               }
            }
          }
    
@@ -316,8 +444,10 @@ if(event.key=='ArrowUp'){
    
              let goAhead = true;
              updated_squares.forEach(sqr => { if(sqr.indexValue === indexValue) goAhead = false;} )
-             if(goAhead)
-             updated_squares.push({value,color,indexValue});
+             if(goAhead){
+              updated_squares.push({value,color,indexValue});
+              changed=true;
+              }
          }
    
            filled++;
@@ -326,7 +456,8 @@ if(event.key=='ArrowUp'){
   }
 
 
-if(event.key === 'ArrowUp' || event.key === 'ArrowDown' || event.key === 'ArrowLeft' || event.key === 'ArrowRight' ){
+ 
+if((event.key === 'ArrowUp' || event.key === 'ArrowDown' || event.key === 'ArrowLeft' || event.key === 'ArrowRight') && changed ){
   updated_squares = [...updated_squares, generateRandomSquare(updated_squares)]
   console.log([...updated_squares]);
   setSquares(updated_squares);
@@ -335,27 +466,6 @@ if(event.key === 'ArrowUp' || event.key === 'ArrowDown' || event.key === 'ArrowL
 
 //setSquares(dummy);
 }
-
-
-function moveLeft(value, indexValue, squares){
-  if(indexValue%4!=0){
-    
-    let canMove = true;
-    let canMerge = false;
-
-    squares.forEach(sqr => {if(sqr.indexValue === indexValue-1){ if(sqr.value == value) canMerge=true; else canMove=false;} })
-    
-    if(canMove){
-      if(canMerge){
-        
-      }
-      else{
-
-      }
-    }
-  }
-}
-
 
 
   // Function to render the squares
@@ -367,6 +477,7 @@ function moveLeft(value, indexValue, squares){
           color={square.color}
           value={square.value}
           index={square.indexValue}
+          preIndex={square.preIndex}
         >
           {square.value} 
         </Square>
