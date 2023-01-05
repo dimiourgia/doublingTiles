@@ -9,11 +9,11 @@ const Square = ({ value, color, index, preIndex}) => {
   
 
 
-  const finalTop = Math.floor(index/4)*100 + 'px';
-  const finalLeft = Math.floor(index%4)*100 + 'px';
+  const finalTop = Math.floor(index/4)*100 + 5 + 'px';
+  const finalLeft = Math.floor(index%4)*100 + 5 + 'px';
 
-  const left = preIndex != '-1' ?  Math.floor(preIndex%4)*100 + 'px' : finalLeft;
-  const top =  preIndex != '-1' ?  Math.floor((preIndex/4))*100 + 'px' : finalTop;
+  const left = preIndex != '-1' ?  Math.floor(preIndex%4)*100 + 5 + 'px' : finalLeft;
+  const top =  preIndex != '-1' ?  Math.floor((preIndex/4))*100 + 5 + 'px' : finalTop;
 
   const spring = {
     type: 'spring',
@@ -27,7 +27,7 @@ const Square = ({ value, color, index, preIndex}) => {
       onClick={()=>console.log(index)}
       initial={{left:left, top:top, scale: preIndex!='-1'? 1 : 0}}
       animate={{left:finalLeft, top:finalTop, scale: 1 }}
-      transition={{duration:.5, spring }}
+      transition={{duration:.3, spring }}
     >
       {value}
     </motion.div>
