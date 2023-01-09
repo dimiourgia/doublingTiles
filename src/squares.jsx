@@ -27,7 +27,7 @@ const Square = ({ value, color, index, preIndex}) => {
       onClick={()=>console.log(index)}
       initial={{left:left, top:top, scale: preIndex!='-1'? 1 : 0}}
       animate={{left:finalLeft, top:finalTop, scale: 1 }}
-      transition={{duration:.3, spring }}
+      transition={{duration:.1, spring }}
     >
       {value}
     </motion.div>

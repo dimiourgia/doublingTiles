@@ -6,7 +6,8 @@ import Square from './squares';
 
 const Grid = () => {
   const [squares, setSquares] = useState([]); //state to keep track of the squares in the grid
-  const squaresRef = useRef(squares);
+  
+
   
    // Function to generate a color based on the square's value
    const getColorForValue = (value) => {
@@ -27,6 +28,9 @@ const Grid = () => {
     }
   };
    
+  const dummy = [{value:2, color:getColorForValue(2), indexValue: 0, preIndex:-1, key:0}, {value:8, color:getColorForValue(2), indexValue: 1, preIndex:-1}, {value:4, color:getColorForValue(4), indexValue: 2, preIndex:-1} ]
+//  setSquares([{value:2, color:getColorForValue(2), indexValue: 0, preIndex:-1}, {value:8, color:getColorForValue(2), indexValue: 1, preIndex:-1}, {value:4, color:getColorForValue(4), indexValue: 2, preIndex:-1} ]);
+
 
   useEffect(() => {
     var lastIndex = [];
@@ -54,6 +58,9 @@ const Grid = () => {
   }, []); 
 
 
+const [key, setKey] = useState(false);
+
+
   const generateRandomSquare = (squares)=>{
 
     if(squares.length>15) return;
@@ -75,13 +82,9 @@ const Grid = () => {
         }
       }
 
-      return {value, color, indexValue, preIndex:'-1'};
+      return {value, color, indexValue, preIndex:'-1', key:indexValue};
 
   }
-
-
-const dummy = [{value:2, color:getColorForValue(2), indexValue: 12}, {value:2, color:getColorForValue(2), indexValue: 1}, {value:4, color:getColorForValue(4), indexValue: 5} ]
-//setSquares(dummy);
 
 
 const handleKeyDown = (event) =>{
@@ -89,7 +92,6 @@ const handleKeyDown = (event) =>{
 if(event.key !== 'ArrowUp' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'ArrowDown'){
   return;
 }
-
 
 
   var updated_squares=[];
@@ -119,6 +121,7 @@ if(event.key !== 'ArrowUp' && event.key !== 'ArrowLeft' && event.key !== 'ArrowR
     var size= slice.length;
     var filled = 0;
 
+
     while(filled<size){
       var skip = false;
 
@@ -128,6 +131,7 @@ if(event.key !== 'ArrowUp' && event.key !== 'ArrowLeft' && event.key !== 'ArrowR
         const value = slice[filled].value*2;
         const color = getColorForValue(value);
         const preIndex = slice[filled+1].indexValue;
+        const key = indexValue;
 
         var indexValue;
         if(event.key==='ArrowLeft') indexValue=(i*4)+filled;
@@ -136,7 +140,7 @@ if(event.key !== 'ArrowUp' && event.key !== 'ArrowLeft' && event.key !== 'ArrowR
         else indexValue=i+(3-filled)*4;
 
         // push the merged tile in updated squares
-        updated_squares.push({value, color, indexValue, preIndex});
+        updated_squares.push({value, color, indexValue, preIndex, key});
 
         //removed the one the merged tiles either filled or filled+1 from slice array
         slice.splice(filled+1,1);
@@ -150,6 +154,7 @@ if(event.key !== 'ArrowUp' && event.key !== 'ArrowLeft' && event.key !== 'ArrowR
         const value = slice[filled].value;
         const color = getColorForValue(value);
         const preIndex = slice[filled].indexValue;
+        const key = indexValue;
         var indexValue;
 
         if(event.key==='ArrowLeft') indexValue=(i*4)+filled;
@@ -164,7 +169,7 @@ if(event.key !== 'ArrowUp' && event.key !== 'ArrowLeft' && event.key !== 'ArrowR
         });
 
         if(goAhead)
-          updated_squares.push({value,color,indexValue, preIndex});
+          updated_squares.push({value,color,indexValue, preIndex, key});
       }
 
       filled++;
@@ -189,7 +194,12 @@ if(event.key !== 'ArrowUp' && event.key !== 'ArrowLeft' && event.key !== 'ArrowR
   if((event.key === 'ArrowUp' || event.key === 'ArrowDown' || event.key === 'ArrowLeft' || event.key === 'ArrowRight') && changed ){
     updated_squares = [...updated_squares, generateRandomSquare(updated_squares)]
     console.log([...updated_squares]);
+    var marking = (key)? 0 : 50;
+
+    updated_squares.forEach(sqr => sqr.key = marking++);
+
     setSquares(updated_squares);
+    setKey(!key);
   }
 
 }
@@ -200,7 +210,7 @@ if(event.key !== 'ArrowUp' && event.key !== 'ArrowLeft' && event.key !== 'ArrowR
     return squares.map((square) => {
       return (
         <Square 
-          key={square.indexValue} 
+          key={square.key} 
           color={square.color}
           value={square.value}
           index={square.indexValue}
