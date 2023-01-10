@@ -4,38 +4,57 @@ import {motion} from 'framer-motion';
 import { useRef } from 'react';
 import Square from './squares';
 
+
+
 const Grid = () => {
   const [squares, setSquares] = useState([]); //state to keep track of the squares in the grid
-  
+  const [gameOver, setGameOver] = useState(false);
 
-  
    // Function to generate a color based on the square's value
    const getColorForValue = (value) => {
     if (value < 4) {
-      return '#EEE4DA';
+      return '#e7b584';
     } else if (value < 8) {
-      return '#EDE0C8';
+      return '#ef9140e0';
     } else if (value < 16) {
-      return '#F2B179';
+      return '#f77f18';
     } else if (value < 32) {
       return '#F59563';
     } else if (value < 64) {
       return '#F67C5F';
     } else if (value < 128) {
       return '#F65E3B';
-    } else {
-      return '#EDCF72';
+    } else if (value < 256) {
+      return '#ebc244';
+    } else if (value < 512) {
+      return '#efb400';
+    } else if (value < 1024) {
+      return '#dafb04';
+    } else if (value < 2048) {
+      return '#8300b380';
+    } else if (value < 4096) {
+      return '#a12d2d';
+    }
+    else {
+      return '#000';
     }
   };
    
   const dummy = [{value:2, color:getColorForValue(2), indexValue: 0, preIndex:-1, key:0}, {value:8, color:getColorForValue(2), indexValue: 1, preIndex:-1}, {value:4, color:getColorForValue(4), indexValue: 2, preIndex:-1} ]
 //  setSquares([{value:2, color:getColorForValue(2), indexValue: 0, preIndex:-1}, {value:8, color:getColorForValue(2), indexValue: 1, preIndex:-1}, {value:4, color:getColorForValue(4), indexValue: 2, preIndex:-1} ]);
 
+  const gridRef = useRef(null);
+
+  useEffect(()=>{
+    gridRef.current.focus();
+  },[squares])
 
   useEffect(() => {
+    gridRef.current.focus();
+
     var lastIndex = [];
     for(let i=0; i<3; i++){
-      const rand = Math.pow(2, Math.floor(Math.random() * 3));
+      const rand = Math.floor(Math.random() * 3);
       if(rand<2) var value = 2;
       else var value = 4;
       // Generate a color for the square based on its value
@@ -55,6 +74,7 @@ const Grid = () => {
       }
         setSquares([...squares,{value, color, indexValue, preIndex:'-1'}]);
     }
+
   }, []); 
 
 
@@ -65,7 +85,7 @@ const [key, setKey] = useState(false);
 
     if(squares.length>15) return;
     
-      const rand = Math.pow(2, Math.floor(Math.random() * 2));
+      const rand = Math.floor(Math.random() * 3);
       if(rand==0) var value = 4;
       else var value = 2;
       // Generate a color for the square based on its value
@@ -189,7 +209,9 @@ if(event.key !== 'ArrowUp' && event.key !== 'ArrowLeft' && event.key !== 'ArrowR
   }
   else changed=true;
 
-  
+  if(!changed && squares.length===16){
+    setGameOver(true);
+  }
 
   if((event.key === 'ArrowUp' || event.key === 'ArrowDown' || event.key === 'ArrowLeft' || event.key === 'ArrowRight') && changed ){
     updated_squares = [...updated_squares, generateRandomSquare(updated_squares)]
@@ -203,6 +225,8 @@ if(event.key !== 'ArrowUp' && event.key !== 'ArrowLeft' && event.key !== 'ArrowR
   }
 
 }
+
+
 
 
   // Function to render the squares
@@ -222,11 +246,43 @@ if(event.key !== 'ArrowUp' && event.key !== 'ArrowLeft' && event.key !== 'ArrowR
     });
   };
 
- 
+  const tiles = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
+
+  const renderEmptyTiles = ()=>{
+    return tiles.map(()=>{
+      return(
+        <div className='tiles'>
+
+        </div>
+      );
+    });
+  }
 
   return (
-    <div className="grid" tabIndex={0} onKeyDown={(event)=>handleKeyDown(event)} onClick={()=> console.log('I am shot')}>
+    <div className="grid" tabIndex={0} ref={gridRef}  onKeyDown={handleKeyDown}>
       {renderSquares()}
+      {renderEmptyTiles()}
+      {gameOver && 
+      <motion.div className='gameOver'
+        initial={{scale: 0}}
+        animate={{scale: 1}}
+     //   transition={{duration:1}}
+      >
+        <p> Game Over ! </p>    
+      </motion.div>
+      }
+      {gameOver && <motion.div className='newGameButtonWrapper'
+        initial={{scale:0}}
+        animate={{scale:1}}
+        transition={{delay:1}}
+
+        onClick={()=>{setGameOver(false); setSquares([generateRandomSquare([])])}}
+        >
+        <button>
+          New Game
+        </button>
+
+        </motion.div>}
     </div>
   )
 
