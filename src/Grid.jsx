@@ -78,6 +78,55 @@ const Grid = () => {
   }, []); 
 
 
+  const touchCoordsRef = useRef({touchStart: {x: 0, y: 0, time: Date.now()}});
+
+  const dispatchKeyPress = (key)=>{
+    gridRef.dispatchEvent(new KeyboardEvent('keypress', {
+      key: key,
+    }));
+  }
+
+
+  useEffect(() => {
+    const handleTouchStart = (e) => {
+      touchCoordsRef.current.touchStart.x = e.targetTouches[0].clientX;
+      touchCoordsRef.current.touchStart.y = e.targetTouches[0].clientY;
+      touchCoordsRef.current.touchStart.time = Date.now();
+    };
+    const handleTouchEnd = (e) => {
+      const threshold = 150;
+      const swipeSpeed = 1; // sec;
+      const touchEndX = e.changedTouches[0].clientX;
+      const touchEndY = e.changedTouches[0].clientY;
+      const touchStartX = touchCoordsRef.current.touchStart.x;
+      const touchStartY = touchCoordsRef.current.touchStart.y;
+      const elapsedTime = (Date.now() - touchCoordsRef.current.touchStart.time) / 1000;
+      if(elapsedTime > swipeSpeed) {
+        return;
+      }
+      const xDistance = touchStartX - touchEndX;
+      const yDistance = touchStartY - touchEndY;
+
+      if(Math.abs(xDistance) < threshold && Math.abs(yDistance) < threshold) {
+        return;
+      }
+
+      if(Math.abs(xDistance) >= Math.abs(yDistance)) {
+        xDistance > 0 ?  handleMouseMove('ArrowRight') : handleMouseMove('ArrowLeft');
+      } else {
+        yDistance > 0 ? handleMouseMove('ArrowDown') : handleMouseMove('ArrowUp');
+      }
+    };
+    window.addEventListener('touchstart', handleTouchStart);
+    window.addEventListener('touchend', handleTouchEnd);
+
+    return () => {
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchend', handleTouchEnd);
+    };
+  });
+
+
 const [key, setKey] = useState(false);
 
 
@@ -106,9 +155,128 @@ const [key, setKey] = useState(false);
 
   }
 
+const handleMouseMove= (key)=>{
+  
+    var updated_squares=[];
+    var changed=false;
+  
+    for(let i=0; i<4; i++){
+      const slice = [];
+      const sqrs = JSON.parse(JSON.stringify(squares));
+  
+      sqrs.forEach(sqr=>{
+        if(key === 'ArrowLeft' || key === 'ArrowRight'){
+          if(Math.floor(sqr.indexValue/4)===i) 
+            slice.push(sqr);
+        }
+        else if(Math.floor(sqr.indexValue%4)===i){
+          slice.push(sqr);
+        }
+      });
+  
+      if(key === 'ArrowLeft' || key === 'ArrowUp'){
+        slice.sort((a,b)=> a.indexValue-b.indexValue);
+      }
+      else{
+        slice.sort((a,b)=>b.indexValue-a.indexValue);
+      }
+  
+      var size= slice.length;
+      var filled = 0;
+  
+  
+      while(filled<size){
+        var skip = false;
+  
+        if(filled+1<size && slice[filled+1].value === slice[filled].value){
+          //merge slice[filled+1] and slice[filled]
+  
+          const value = slice[filled].value*2;
+          const color = getColorForValue(value);
+          const preIndex = slice[filled+1].indexValue;
+          const key = indexValue;
+  
+          var indexValue;
+          if(key==='ArrowLeft') indexValue=(i*4)+filled;
+          else if(key === 'ArrowRight') indexValue=(i*4)+3-filled;
+          else if(key === 'ArrowUp') indexValue=i+filled*4;
+          else indexValue=i+(3-filled)*4;
+  
+          // push the merged tile in updated squares
+          updated_squares.push({value, color, indexValue, preIndex, key});
+  
+          //removed the one the merged tiles either filled or filled+1 from slice array
+          slice.splice(filled+1,1);
+  
+          //updated size
+          size--;
+          skip = true;
+        }
+  
+        if(!skip){
+          const value = slice[filled].value;
+          const color = getColorForValue(value);
+          const preIndex = slice[filled].indexValue;
+          const key = indexValue;
+          var indexValue;
+  
+          if(key==='ArrowLeft') indexValue=(i*4)+filled;
+          else if(key === 'ArrowRight') indexValue=(i*4)+3-filled;
+          else if(key === 'ArrowUp') indexValue=i+filled*4;
+          else indexValue=i+(3-filled)*4;
+  
+          let goAhead = true;
+          updated_squares.forEach(sqr =>{ 
+          if(sqr.indexValue === indexValue) 
+              goAhead = false;
+          });
+  
+          if(goAhead)
+            updated_squares.push({value,color,indexValue, preIndex, key});
+        }
+  
+        filled++;
+      }
+    }
+  
+  
+    if(squares.length === updated_squares.length ){
+      squares.sort((a,b)=>a.indexValue-b.indexValue);
+      updated_squares.sort((a,b)=>a.indexValue-b.indexValue);
+  
+      for(let i=0; i<squares.length; i++){
+        if(squares[i].indexValue !== updated_squares[i].indexValue || squares[i].value !== updated_squares[i].value){
+          changed=true;
+        }
+      }
+    }
+    else changed=true;
+  
+    
+    if(changed){
+      updated_squares = [...updated_squares, generateRandomSquare(updated_squares)]
+      console.log([...updated_squares]);
+      var marking = (key)? 0 : 50;
+  
+      updated_squares.forEach(sqr => sqr.key = marking++);
+  
+      setSquares(updated_squares);
+      setKey(!key);
+    }
+  
+    const gameContinues = canGameContinue(updated_squares);
+  
+    console.log(gameContinues);
+  
+    if(!gameContinues){
+      setGameOver(true);
+    }
+}
+
 
 const handleKeyDown = (event) =>{
   console.log(event.key);
+
 if(event.key !== 'ArrowUp' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'ArrowDown'){
   return;
 }
@@ -310,7 +478,7 @@ for(let i=0; i<4; i++){
   }
 
   return (
-    <div className="grid" tabIndex={0} ref={gridRef}  onKeyDown={handleKeyDown}>
+    <div className="grid" tabIndex={0} ref={gridRef}  onKeyDown={handleKeyDown} onMouseDown>
       {renderSquares()}
       {renderEmptyTiles()}
       {gameOver && 
