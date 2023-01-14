@@ -221,7 +221,7 @@ if(event.key !== 'ArrowUp' && event.key !== 'ArrowLeft' && event.key !== 'ArrowR
     setKey(!key);
   }
 
-  const gameContinues = canGameContinue();
+  const gameContinues = canGameContinue(updated_squares);
 
   console.log(gameContinues);
 
@@ -231,10 +231,8 @@ if(event.key !== 'ArrowUp' && event.key !== 'ArrowLeft' && event.key !== 'ArrowR
 
 }
 
-const canGameContinue = ()=>{
-  if(squares.length!==16) return true;
-
-  const sqrs = JSON.parse(JSON.stringify(squares));
+const canGameContinue = (sqrs)=>{
+  if(sqrs.length!==16) return true;
   
 //left right
   for(let i=0; i<4; i++){
@@ -247,6 +245,7 @@ const canGameContinue = ()=>{
     });
 
     slice.sort((a,b) => a.indexValue-b.indexValue);
+    console.log(slice);
 
     for(let j=1; j<4; j++){
       if(slice[j-1].value === slice[j].value) return true;
@@ -267,12 +266,14 @@ for(let i=0; i<4; i++){
 
   slice.sort((a,b) => a.indexValue-b.indexValue);
 
+  console.log(slice);
+
   for(let j=1; j<4; j++){
     if(slice[j-1].value === slice[j].value) return true;
   }
 
-  return false;
 }
+  return false;
 
 }
 
