@@ -209,10 +209,7 @@ if(event.key !== 'ArrowUp' && event.key !== 'ArrowLeft' && event.key !== 'ArrowR
   }
   else changed=true;
 
-  if(!changed && squares.length===16){
-    setGameOver(true);
-  }
-
+  
   if((event.key === 'ArrowUp' || event.key === 'ArrowDown' || event.key === 'ArrowLeft' || event.key === 'ArrowRight') && changed ){
     updated_squares = [...updated_squares, generateRandomSquare(updated_squares)]
     console.log([...updated_squares]);
@@ -223,6 +220,59 @@ if(event.key !== 'ArrowUp' && event.key !== 'ArrowLeft' && event.key !== 'ArrowR
     setSquares(updated_squares);
     setKey(!key);
   }
+
+  const gameContinues = canGameContinue();
+
+  console.log(gameContinues);
+
+  if(!gameContinues){
+    setGameOver(true);
+  }
+
+}
+
+const canGameContinue = ()=>{
+  if(squares.length!==16) return true;
+
+  const sqrs = JSON.parse(JSON.stringify(squares));
+  
+//left right
+  for(let i=0; i<4; i++){
+  
+    const slice=[];
+
+    sqrs.forEach(sqr=>{
+        if(Math.floor(sqr.indexValue/4)===i) 
+          slice.push(sqr);
+    });
+
+    slice.sort((a,b) => a.indexValue-b.indexValue);
+
+    for(let j=1; j<4; j++){
+      if(slice[j-1].value === slice[j].value) return true;
+    }
+
+  }
+
+//up down
+
+for(let i=0; i<4; i++){
+  
+  const slice=[];
+
+  sqrs.forEach(sqr=>{
+      if(Math.floor(sqr.indexValue%4)===i) 
+        slice.push(sqr);
+  });
+
+  slice.sort((a,b) => a.indexValue-b.indexValue);
+
+  for(let j=1; j<4; j++){
+    if(slice[j-1].value === slice[j].value) return true;
+  }
+
+  return false;
+}
 
 }
 
