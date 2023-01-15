@@ -253,6 +253,7 @@ const handleMouseMove= (key)=>{
     else changed=true;
   
     
+
     if(changed){
       updated_squares = [...updated_squares, generateRandomSquare(updated_squares)]
       console.log([...updated_squares]);
@@ -330,7 +331,7 @@ if(event.key !== 'ArrowUp' && event.key !== 'ArrowLeft' && event.key !== 'ArrowR
         // push the merged tile in updated squares
         updated_squares.push({value, color, indexValue, preIndex, key});
 
-        //removed the one the merged tiles either filled or filled+1 from slice array
+        //remove the merged tile - either filled or filled+1 from slice array
         slice.splice(filled+1,1);
 
         //updated size
@@ -466,23 +467,36 @@ for(let i=0; i<4; i++){
   };
 
   const tiles = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
+  const width = innerWidth>400? 400 : innerWidth;
+  const offset = width/100;
 
   const renderEmptyTiles = ()=>{
     return tiles.map(()=>{
       return(
-        <div className='tiles'>
+        <div className='tiles'
+        style={{margin:offset, width: width/4 - 2*offset, height: width/4-2*offset}}
+        >
 
         </div>
       );
     });
   }
 
+
   return (
-    <div className="grid" tabIndex={0} ref={gridRef}  onKeyDown={handleKeyDown} onMouseDown>
+    <div className="grid" tabIndex={0} ref={gridRef}  onKeyDown={handleKeyDown} onMouseDown
+      style={{
+        left: (innerWidth/2 - width/2),
+        top:  (innerHeight/2 - width/2),
+        width: width,
+        height: width,
+      }}
+    >
       {renderSquares()}
       {renderEmptyTiles()}
       {gameOver && 
       <motion.div className='gameOver'
+        style={{width: width}}
         initial={{scale: 0}}
         animate={{scale: 1}}
      //   transition={{duration:1}}
@@ -491,6 +505,7 @@ for(let i=0; i<4; i++){
       </motion.div>
       }
       {gameOver && <motion.div className='newGameButtonWrapper'
+        style={{width: width}}
         initial={{scale:0}}
         animate={{scale:1}}
         transition={{delay:1}}

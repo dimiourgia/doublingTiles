@@ -1,11 +1,7 @@
 .grid {
     position: absolute;
-    left:calc(50% - 200px);
-    top: calc(50% - 200px);
     display: flex;
     flex-wrap: wrap;
-    width: 400px;
-    height: 400px;
     margin: 0 auto;
     border: 1px solid #cdcdcd;
     border-radius: 12px;
@@ -13,8 +9,6 @@
   
   .square {
     position: absolute;
-    width: 92px;
-    height: 92px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -28,16 +22,13 @@
   }
 
   .tiles{
-    margin: 4px;
-    width: 92px;
-    height: 92px;
+    
     display: flex;
     border-radius: 12px;
     background: #e5e5da;
   }
 
   .gameOver{
-    width: 400px;
     left: 0px;
     top: 137px;
     position: absolute;
@@ -54,7 +45,6 @@
 
   .newGameButtonWrapper{
     position: absolute;
-    width: 400px;
     left:0px;
     bottom: 30px;
     height: 80px;
