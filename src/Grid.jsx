@@ -256,7 +256,6 @@ const handleMouseMove= (simulateKey)=>{
 
     if(changed){
       updated_squares = [...updated_squares, generateRandomSquare(updated_squares)]
-      console.log([...updated_squares]);
       var marking = (key)? 0 : 50;
   
       updated_squares.forEach(sqr => sqr.key = marking++);
@@ -266,8 +265,7 @@ const handleMouseMove= (simulateKey)=>{
     }
   
     const gameContinues = canGameContinue(updated_squares);
-  
-    console.log(gameContinues);
+
   
     if(!gameContinues){
       setGameOver(true);
@@ -276,8 +274,6 @@ const handleMouseMove= (simulateKey)=>{
 
 
 const handleKeyDown = (event) =>{
-  console.log(event.key);
-
 if(event.key !== 'ArrowUp' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'ArrowDown'){
   return;
 }
@@ -381,7 +377,6 @@ if(event.key !== 'ArrowUp' && event.key !== 'ArrowLeft' && event.key !== 'ArrowR
   
   if((event.key === 'ArrowUp' || event.key === 'ArrowDown' || event.key === 'ArrowLeft' || event.key === 'ArrowRight') && changed ){
     updated_squares = [...updated_squares, generateRandomSquare(updated_squares)]
-    console.log([...updated_squares]);
     var marking = (key)? 0 : 50;
 
     updated_squares.forEach(sqr => sqr.key = marking++);
@@ -391,8 +386,6 @@ if(event.key !== 'ArrowUp' && event.key !== 'ArrowLeft' && event.key !== 'ArrowR
   }
 
   const gameContinues = canGameContinue(updated_squares);
-
-  console.log(gameContinues);
 
   if(!gameContinues){
     setGameOver(true);
@@ -414,7 +407,6 @@ const canGameContinue = (sqrs)=>{
     });
 
     slice.sort((a,b) => a.indexValue-b.indexValue);
-    console.log(slice);
 
     for(let j=1; j<4; j++){
       if(slice[j-1].value === slice[j].value) return true;
@@ -434,8 +426,6 @@ for(let i=0; i<4; i++){
   });
 
   slice.sort((a,b) => a.indexValue-b.indexValue);
-
-  console.log(slice);
 
   for(let j=1; j<4; j++){
     if(slice[j-1].value === slice[j].value) return true;
