@@ -112,9 +112,9 @@ const Grid = () => {
       }
 
       if(Math.abs(xDistance) >= Math.abs(yDistance)) {
-        xDistance > 0 ?  handleMouseMove('ArrowRight') : handleMouseMove('ArrowLeft');
+        xDistance > 0 ?  handleMouseMove('ArrowLeft') : handleMouseMove('ArrowRight');
       } else {
-        yDistance > 0 ? handleMouseMove('ArrowDown') : handleMouseMove('ArrowUp');
+        yDistance > 0 ? handleMouseMove('ArrowUp') : handleMouseMove('ArrowDown');
       }
     };
     window.addEventListener('touchstart', handleTouchStart);
@@ -155,7 +155,7 @@ const [key, setKey] = useState(false);
 
   }
 
-const handleMouseMove= (key)=>{
+const handleMouseMove= (simulateKey)=>{
   
     var updated_squares=[];
     var changed=false;
@@ -165,7 +165,7 @@ const handleMouseMove= (key)=>{
       const sqrs = JSON.parse(JSON.stringify(squares));
   
       sqrs.forEach(sqr=>{
-        if(key === 'ArrowLeft' || key === 'ArrowRight'){
+        if(simulateKey === 'ArrowLeft' || simulateKey === 'ArrowRight'){
           if(Math.floor(sqr.indexValue/4)===i) 
             slice.push(sqr);
         }
@@ -174,7 +174,7 @@ const handleMouseMove= (key)=>{
         }
       });
   
-      if(key === 'ArrowLeft' || key === 'ArrowUp'){
+      if(simulateKey === 'ArrowLeft' || simulateKey === 'ArrowUp'){
         slice.sort((a,b)=> a.indexValue-b.indexValue);
       }
       else{
@@ -197,9 +197,9 @@ const handleMouseMove= (key)=>{
           const key = indexValue;
   
           var indexValue;
-          if(key==='ArrowLeft') indexValue=(i*4)+filled;
-          else if(key === 'ArrowRight') indexValue=(i*4)+3-filled;
-          else if(key === 'ArrowUp') indexValue=i+filled*4;
+          if(simulateKey==='ArrowLeft') indexValue=(i*4)+filled;
+          else if(simulateKey === 'ArrowRight') indexValue=(i*4)+3-filled;
+          else if(simulateKey === 'ArrowUp') indexValue=i+filled*4;
           else indexValue=i+(3-filled)*4;
   
           // push the merged tile in updated squares
@@ -220,9 +220,9 @@ const handleMouseMove= (key)=>{
           const key = indexValue;
           var indexValue;
   
-          if(key==='ArrowLeft') indexValue=(i*4)+filled;
-          else if(key === 'ArrowRight') indexValue=(i*4)+3-filled;
-          else if(key === 'ArrowUp') indexValue=i+filled*4;
+          if(simulateKey==='ArrowLeft') indexValue=(i*4)+filled;
+          else if(simulateKey === 'ArrowRight') indexValue=(i*4)+3-filled;
+          else if(simulateKey === 'ArrowUp') indexValue=i+filled*4;
           else indexValue=i+(3-filled)*4;
   
           let goAhead = true;
