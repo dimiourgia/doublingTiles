@@ -9,6 +9,7 @@ import Square from './squares';
 const Grid = () => {
   const [squares, setSquares] = useState([]); //state to keep track of the squares in the grid
   const [gameOver, setGameOver] = useState(false);
+  const [score, setScore] = useState(0);
 
    // Function to generate a color based on the square's value
    const getColorForValue = (value) => {
@@ -257,11 +258,12 @@ const handleMouseMove= (simulateKey)=>{
     if(changed){
       updated_squares = [...updated_squares, generateRandomSquare(updated_squares)]
       var marking = (key)? 0 : 50;
-  
-      updated_squares.forEach(sqr => sqr.key = marking++);
+      var totalScore=0;
+      updated_squares.forEach(sqr => {sqr.key = marking++, totalScore+= sqr.value});
   
       setSquares(updated_squares);
       setKey(!key);
+      setScore(marking);
     }
   
     const gameContinues = canGameContinue(updated_squares);
@@ -379,10 +381,12 @@ if(event.key !== 'ArrowUp' && event.key !== 'ArrowLeft' && event.key !== 'ArrowR
     updated_squares = [...updated_squares, generateRandomSquare(updated_squares)]
     var marking = (key)? 0 : 50;
 
-    updated_squares.forEach(sqr => sqr.key = marking++);
+    var totalScore=0;
+    updated_squares.forEach(sqr => {sqr.key = marking++, totalScore+= sqr.value});
 
     setSquares(updated_squares);
     setKey(!key);
+    setScore(totalScore);
   }
 
   const gameContinues = canGameContinue(updated_squares);
@@ -507,6 +511,15 @@ for(let i=0; i<4; i++){
         </button>
 
         </motion.div>}
+        <div className='score'
+        style={{
+          left: (width*(3/8)),
+          top:  -50,
+          width: width/4
+        }}
+      >
+        {score}
+      </div>
     </div>
   )
 

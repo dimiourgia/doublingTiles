@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import './App.css'
 import Grid from './Grid'
 
@@ -5,9 +6,8 @@ function App() {
  
 
   return (
-      <Grid>
-      </Grid>
-  )
+      <Grid/>
+      )
 }
 
 export default App
