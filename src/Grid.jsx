@@ -74,7 +74,12 @@ const Grid = () => {
         }
       }
         setSquares([...squares,{value, color, indexValue, preIndex:'-1'}]);
+       
+        var total= 0;
+        total+=value;
     }
+
+    setScore(total);
 
   }, []); 
 
@@ -504,7 +509,7 @@ for(let i=0; i<4; i++){
         animate={{scale:1}}
         transition={{delay:1}}
 
-        onClick={()=>{setGameOver(false); setSquares([generateRandomSquare([])])}}
+        onClick={()=>{setGameOver(false); setSquares([generateRandomSquare([])]); setScore(2) }}
         >
         <button>
           New Game
