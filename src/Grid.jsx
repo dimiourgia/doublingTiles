@@ -507,7 +507,7 @@ for(let i=0; i<4; i++){
         style={{width: width}}
         initial={{scale:0}}
         animate={{scale:1}}
-        transition={{delay:1}}
+        transition={{delay:1.1}}
 
         onClick={()=>{setGameOver(false); setSquares([generateRandomSquare([])]); setScore(2) }}
         >
