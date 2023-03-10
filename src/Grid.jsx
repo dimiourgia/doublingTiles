@@ -30,11 +30,11 @@ const Grid = () => {
     } else if (value < 512) {
       return '#efb400';
     } else if (value < 1024) {
-      return '#dafb04';
+      return '#fbe304';
     } else if (value < 2048) {
-      return '#8300b380';
+      return '#94a112b5';
     } else if (value < 4096) {
-      return '#a12d2d';
+      return '#ffeeb9';
     }
     else {
       return '#000';
